@@ -1,14 +1,18 @@
 {
-  "name": "tree-sitter-gitignore",
+  "name": "tree-sitter-gitattributes",
   "version": "0.1.0",
-  "description": "Gitignore grammar for tree-sitter",
+  "description": "Gitattributes grammar for tree-sitter",
   "main": "bindings/node",
-  "scripts": {},
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test"
+  },
   "keywords": [
     "parser",
     "lexer"
   ],
   "author": "Shun Sambongi",
+  "contributors": ["Matthew Toohey <contact@mtoohey.com>"],
   "license": "MIT",
   "dependencies": {
     "nan": "^2.15.0"
@@ -18,12 +22,9 @@
   },
   "tree-sitter": [
     {
-      "scope": "source.gitignore",
+      "scope": "source.gitattributes",
       "file-types": [
-        ".gitignore",
-        ".ignore",
-        ".fdignore",
-        ".rgignore"
+        ".gitattributes"
       ]
     }
   ]

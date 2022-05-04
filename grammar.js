@@ -19,19 +19,42 @@ const NAMED_CHARACTER_CLASSES = [
 ].map(name => seq("[:", field("name", name), ":]"));
 
 module.exports = grammar({
-  name: "gitignore",
+  name: "gitattributes",
   extras: $ => [],
   rules: {
     document: $ => repeat($._line),
 
     _line: $ =>
       seq(
-        optional(choice($.comment, $.pattern)),
-        optional($._trailing_spaces),
-        $._newline
+        optional(choice($.comment, $.attributes_line)),
+        optional(/[ \t]+/),
+        /\r?\n/
       ),
 
     comment: $ => /#[^\n]*/,
+    
+    attributes_line: $ =>
+      prec.right(
+        seq(
+          choice($.pattern, $.quoted_pattern),
+          repeat(seq(/[ \t]+/, $._attribute_declaration))
+        )
+      ),
+    _attribute_declaration: $ =>
+      choice(
+        $.attribute_set,
+        $.attribute_unset,
+        $.attribute_set_to
+      ),
+    attribute_set: $ => $.attribute,
+    attribute_unset: $ => seq(choice("-", "!"), $.attribute),
+    attribute_set_to: $ => seq($.attribute, "=", $.value),
+    
+    quoted_pattern: $ => seq('"', $.pattern, '"'),
+
+    // matches the behaviour here: https://github.com/git/git/blob/master/attr.c
+    attribute: $ => /[^ \t\r\n=!-][^ \t\r\n=]*/,
+    value: $ => /[^ \t\r\n]+/,
 
     pattern: $ =>
       seq(
@@ -57,9 +80,9 @@ module.exports = grammar({
         )
       ),
 
-    pattern_char: $ => /[^\n/*?]/,
+    pattern_char: $ => /[^ \t\r\n/*?]/,
 
-    pattern_char_escaped: $ => seq("\\", /[^\n/]/),
+    pattern_char_escaped: $ => seq("\\", /[^ \t\r\n/]/),
 
     _wildcard: $ =>
       choice(
@@ -92,14 +115,11 @@ module.exports = grammar({
       seq($._bracket_char_closing_bracket, "-", $._bracket_char),
 
     _bracket_char: $ => choice($.bracket_char, $.bracket_char_escaped),
-    bracket_char: $ => /[^\n/\]]/,
-    bracket_char_escaped: $ => seq("\\", /[^\n/]/),
+    bracket_char: $ => /[^ \t\r\n/\]]/,
+    bracket_char_escaped: $ => seq("\\", /[^ \t\r\n/]/),
 
     bracket_range: $ => seq($._bracket_char, "-", $._bracket_char),
 
     bracket_char_class: $ => choice(...NAMED_CHARACTER_CLASSES),
-
-    _trailing_spaces: $ => / +/,
-    _newline: $ => /\r?\n/,
   },
 });

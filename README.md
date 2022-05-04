@@ -1,4 +1,4 @@
-# tree-sitter-gitignore
+# tree-sitter-gitattributes
 
-A tree-sitter parser for `.gitignore` files.
+A tree-sitter parser for `.gitattributes` files.
 

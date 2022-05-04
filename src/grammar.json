@@ -1,5 +1,5 @@
 {
-  "name": "gitignore",
+  "name": "gitattributes",
   "rules": {
     "document": {
       "type": "REPEAT",
@@ -23,7 +23,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "pattern"
+                  "name": "attributes_line"
                 }
               ]
             },
@@ -36,8 +36,8 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "_trailing_spaces"
+              "type": "PATTERN",
+              "value": "[ \\t]+"
             },
             {
               "type": "BLANK"
@@ -45,14 +45,137 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "_newline"
+          "type": "PATTERN",
+          "value": "\\r?\\n"
         }
       ]
     },
     "comment": {
       "type": "PATTERN",
       "value": "#[^\\n]*"
+    },
+    "attributes_line": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "pattern"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "quoted_pattern"
+              }
+            ]
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]+"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_attribute_declaration"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "_attribute_declaration": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "attribute_set"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "attribute_unset"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "attribute_set_to"
+        }
+      ]
+    },
+    "attribute_set": {
+      "type": "SYMBOL",
+      "name": "attribute"
+    },
+    "attribute_unset": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "-"
+            },
+            {
+              "type": "STRING",
+              "value": "!"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "attribute"
+        }
+      ]
+    },
+    "attribute_set_to": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "attribute"
+        },
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "SYMBOL",
+          "name": "value"
+        }
+      ]
+    },
+    "quoted_pattern": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "\""
+        },
+        {
+          "type": "SYMBOL",
+          "name": "pattern"
+        },
+        {
+          "type": "STRING",
+          "value": "\""
+        }
+      ]
+    },
+    "attribute": {
+      "type": "PATTERN",
+      "value": "[^ \\t\\r\\n=!-][^ \\t\\r\\n=]*"
+    },
+    "value": {
+      "type": "PATTERN",
+      "value": "[^ \\t\\r\\n]+"
     },
     "pattern": {
       "type": "SEQ",
@@ -179,7 +302,7 @@
     },
     "pattern_char": {
       "type": "PATTERN",
-      "value": "[^\\n/*?]"
+      "value": "[^ \\t\\r\\n/*?]"
     },
     "pattern_char_escaped": {
       "type": "SEQ",
@@ -190,7 +313,7 @@
         },
         {
           "type": "PATTERN",
-          "value": "[^\\n/]"
+          "value": "[^ \\t\\r\\n/]"
         }
       ]
     },
@@ -369,7 +492,7 @@
     },
     "bracket_char": {
       "type": "PATTERN",
-      "value": "[^\\n/\\]]"
+      "value": "[^ \\t\\r\\n/\\]]"
     },
     "bracket_char_escaped": {
       "type": "SEQ",
@@ -380,7 +503,7 @@
         },
         {
           "type": "PATTERN",
-          "value": "[^\\n/]"
+          "value": "[^ \\t\\r\\n/]"
         }
       ]
     },
@@ -657,14 +780,6 @@
           ]
         }
       ]
-    },
-    "_trailing_spaces": {
-      "type": "PATTERN",
-      "value": " +"
-    },
-    "_newline": {
-      "type": "PATTERN",
-      "value": "\\r?\\n"
     }
   },
   "extras": [],
