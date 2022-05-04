@@ -11,6 +11,7 @@
       with import nixpkgs { inherit system; }; {
         devShells.default = mkShell {
           nativeBuildInputs = [
+            clang
             nodejs
             nodePackages.npm
             tree-sitter
